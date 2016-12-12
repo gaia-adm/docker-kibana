@@ -1,0 +1,23 @@
+[Unit]
+Description=Kibana 4.3.0 (for ElasticSearch 2.1.0)
+Documentation=https://www.elastic.co/guide/en/kibana/current/releasenotes.html
+After=registrator.service
+Wants=registrator.service
+
+[Service]
+TimeoutStartSec=10min
+TimeoutStopSec=15
+KillMode=none
+EnvironmentFile=/etc/environment
+Restart=on-failure
+RestartSec=20s
+ExecStartPre=-/usr/bin/docker kill kibana
+ExecStartPre=-/usr/bin/docker rm kibana
+ExecStart=/bin/bash -a -c '/usr/bin/docker run  --name kibana  -e ELASTICSEARCH_URL=http://es.skydns.local:9200  -p 5601:5601  -e SERVICE_NAME=kibana  -e SERVICE_TAGS=master  gaiaadm/kibana'
+ExecStop=/usr/bin/docker stop kibana
+
+[Install]
+WantedBy=multi-user.target
+
+[X-Fleet]
+MachineMetadata=general=true
